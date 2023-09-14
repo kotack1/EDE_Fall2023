@@ -71,7 +71,7 @@ colnames <- c('Student Names', 'Test Scores', 'Passed')
 11. Apply your function to the vector with test scores that you created in number 5.
 
 ```{r basics 3}
-
+ifelse(test_scores >= 50, print('TRUE'), print('FALSE'))
 ```
 
 12. QUESTION: Which option of `if` and `else` vs. `ifelse` worked? Why?
