@@ -4,7 +4,7 @@ author: "Katie Tack"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
 ## OVERVIEW
@@ -57,9 +57,9 @@ thirty_mean > thirty_median #ask R if the mean is greater than the median
 ```{r basics 2}
 student_names <- c('Amanda','Brian','Jeff','Ana','Debbie','Ethan') #character
 test_scores <- c(79,42,95,51,88,32) #numeric
-if_passed <- test_scores >= 50
-df_student_info <- data.frame(StudentName = student_names, StudentScores = test_scores, Passed = if_passed)
-colnames <- c('Student Names', 'Test Scores', 'Passed')
+if_passed <- test_scores >= 50 #logical
+df_student_info <- data.frame(StudentName = student_names, StudentScores = test_scores, Passed = if_passed) #combined vectors
+colnames <- c('Student Names', 'Test Scores', 'Passed') #renamed columns
 ```
 
 9.  QUESTION: How is this data frame different from a matrix?
@@ -71,9 +71,10 @@ colnames <- c('Student Names', 'Test Scores', 'Passed')
 11. Apply your function to the vector with test scores that you created in number 5.
 
 ```{r basics 3}
-ifelse(test_scores >= 50, print('TRUE'), print('FALSE'))
+passed <- ifelse(test_scores >= 50, 'TRUE', 'FALSE')
+print(passed)
 ```
 
 12. QUESTION: Which option of `if` and `else` vs. `ifelse` worked? Why?
 
-> Answer:
+> Answer: I used 'ifelse' because it is basically a more simplified version of 'if' and 'else' and thus takes up fewer lines of code. It worked as intented and prints out TRUE or FALSE based whether the test scores from the vector I created earlier pass with a score of 50 or higher. I named the function passed so that I could use print(passed) after determining whether the scores passed or not. When I included the print function within the ifelse statement, it would first print TRUE and FALSE and then give me what I was looking for, but making a separate print function solved that issue. I had some troubles with attempting to use 'if' and 'else' for this project, so that is ultimately why I decided to use 'ifelse'. I am still going to play around with the code a bit afterwards to see what else I can do with it and gain some more practice with 'if' and 'else'.
