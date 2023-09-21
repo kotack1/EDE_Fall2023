@@ -149,14 +149,19 @@ unique(x, )
 
 14. Create a bar graph of functionalGroup counts. This shows you what type of litter is collected at the Niwot Ridge sites. Notice that litter types are fairly equally distributed across the Niwot Ridge sites.
 
-```{r}
-
+```{r Litter: Bar Graph}
+ggplot(Litter, aes(x = functionalGroup)) +
+  geom_bar()
 ```
 
 15. Using `geom_boxplot` and `geom_violin`, create a boxplot and a violin plot of dryMass by functionalGroup.
 
-```{r}
+```{r Litter: Boxplot and Violin Plot}
+ggplot(Litter) +
+  geom_boxplot(aes(x = dryMass, y = functionalGroup))
 
+ggplot(Litter) +
+  geom_violin(aes(x = dryMass, y = functionalGroup))
 ```
 
 Why is the boxplot a more effective visualization option than the violin plot in this case?
