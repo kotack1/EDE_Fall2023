@@ -47,18 +47,20 @@ Litter <- read.csv("./Data/Raw/NEON_NIWO_Litter_massdata_2018-08_raw.csv", strin
 
 2.  The neonicotinoid dataset was collected from the Environmental Protection Agency's ECOTOX Knowledgebase, a database for ecotoxicology research. Neonicotinoids are a class of insecticides used widely in agriculture. The dataset that has been pulled includes all studies published on insects. Why might we be interested in the ecotoxicology of neonicotinoids on insects? Feel free to do a brief internet search if you feel you need more background information.
 
-> Answer:
+> Answer: Neonicotinoids are a type of pesticide that is chemically related to nicotine. They can be extremeley harmful to bees, We would be interested in the ecotoxicology of neonictinoids on insects because bees are extremely necessary for our world in a lot of different ways, and we need to make sure we are not inadvertently harming them. 
+https://pubmed.ncbi.nlm.nih.gov/20737791/
 
 3.  The Niwot Ridge litter and woody debris dataset was collected from the National Ecological Observatory Network, which collectively includes 81 aquatic and terrestrial sites across 20 ecoclimatic domains. 32 of these sites sample forest litter and woody debris, and we will focus on the Niwot Ridge long-term ecological research (LTER) station in Colorado. Why might we be interested in studying litter and woody debris that falls to the ground in forests? Feel free to do a brief internet search if you feel you need more background information.
 
-> Answer:
+> Answer: Litter and woody debris is interesting to study because of the role it plays in the ecosystem, particularly in terms of carbon budgets and nutrient cycling. It is also an important habitat.
+https://www.fs.usda.gov/research/treesearch/20001#:~:text=Woody%20debris%20is%20an%20important,influencing%20water%20flows%20and%20sediment
 
 4.  How is litter and woody debris sampled as part of the NEON network? Read the NEON_Litterfall_UserGuide.pdf document to learn more. List three pieces of salient information about the sampling methods here:
 
 > Answer: 
- 1.
- 2.
- 3. 
+ 1. Plot size is determined by whether or not there is low-saturated vegetation over the tower airsheds.
+ 2. Ground traps are sampled 1x per year, deciduous forests are sampled 1x every two weeks, and evergreen forests are sampled 1x every 1-2 months.
+ 3. Trap placement in sites with >50% aerial cover is random, and trap placement in sites with <50% cover is targeted.
 
 ## Obtain basic summaries of your data (Neonics)
 
@@ -74,7 +76,7 @@ dim(Neonics)
 summary(Neonics$Effect)
 ```
 
-> Answer:
+> Answer: Population and mortality are two of the most common effects to be studied. These effects might specifically be of interest because researchers would need to know how the neonictinoids are effecting the beeds at the population level, and they need to know if the pesticide is specificlaly killing the bees or just non-fatally harming them.
 
 
 7.  Using the `summary` function, determine the six most commonly studied species in the dataset (common name). What do these species have in common, and why might they be of interest over other insects? Feel free to do a brief internet search for more information if needed.[TIP: The `sort()` command can sort the output of the summary command...]
@@ -84,7 +86,7 @@ CommonNameSummary <- summary(Neonics$Species.Common.Name)
 sort(CommonNameSummary, decreasing = TRUE)
 ```
 
-> Answer:
+> Answer: These species are generally seen as beneficial for farmers and gardeners. For example, parasitic wasps kill pests and honey bees are excellent pollinators. Because of their use to humans, they are of more interest than other species might be.
 
 8.  Concentrations are always a numeric value. What is the class of `Conc.1..Author.` column in the dataset, and why is it not numeric?
 
@@ -92,7 +94,7 @@ sort(CommonNameSummary, decreasing = TRUE)
 class(Neonics$Conc.1..Author.)
 ```
 
-> Answer:
+> Answer: The class of Conc.1..Author is a factor. It is not numeric so that there can be an instrinsic order to the values.
 
 ## Explore your data graphically (Neonics)
 
@@ -112,7 +114,7 @@ ggplot(Neonics) +
 
 Interpret this graph. What are the most common test locations, and do they differ over time?
 
-> Answer:
+> Answer:The most common test locations are lab and field natural. They generally tend to spike and dip around the same time, which may be due to general spikes and dips of studying neonictiniods as a whole. Labs saw earlier use than natural fields, which may be due to the science and technology of the time.
 
 11. Create a bar graph of Endpoint counts. What are the two most common end points, and how are they defined? Consult the ECOTOX_CodeAppendix for more information. 
 
@@ -124,7 +126,7 @@ ggplot(Neonics, aes(x = Endpoint)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ```
 
-> Answer:
+> Answer: The two most common end points are LOEL and NOEL. LOEL is defined as lowest-observable-effect-level, or the lowest dose producing effects that were significantlly different from responses of controls. NOEL is defined as no-observable-effect-level, or the highest dose producing effects not significantlly different from responses of controls according to author's reported statistical test.
 
 ## Explore your data (Litter)
 
@@ -144,7 +146,7 @@ print(AugustDates)
 unique(Litter$namedLocation)
 ```
 
-> Answer:
+> Answer: Summary tells you how many of each type there are, whereas Unique just shows you the unique types.
 
 14. Create a bar graph of functionalGroup counts. This shows you what type of litter is collected at the Niwot Ridge sites. Notice that litter types are fairly equally distributed across the Niwot Ridge sites.
 
@@ -165,8 +167,8 @@ ggplot(Litter) +
 
 Why is the boxplot a more effective visualization option than the violin plot in this case?
 
-> Answer:
+> Answer: A boxplot is more effective in this case because you can better visualize how outliers affect the results.
 
 What type(s) of litter tend to have the highest biomass at these sites?
 
-> Answer:
+> Answer:Needles generally have the highest biomass at these sites.
