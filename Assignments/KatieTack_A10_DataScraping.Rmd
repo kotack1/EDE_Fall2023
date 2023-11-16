@@ -23,8 +23,16 @@ This exercise accompanies the lessons in Environmental Data Analytics on data sc
 * Load the packages `tidyverse`, `rvest`, and any others you end up using.
 * Check your working directory
 
-```{r 1. Project Setup, message = FALSE}
+```{r 1. Project Setup, message = FALSE, warning=FALSE}
 #1 
+library(tidyverse)
+library(rvest)
+library(here)
+library(ggplot2)
+library(lubridate)
+library(purrr)
+
+here()
 
 
 ```
@@ -36,8 +44,11 @@ This exercise accompanies the lessons in Environmental Data Analytics on data sc
  
 Indicate this website as the as the URL to be scraped. (In other words, read the contents into an `rvest` webpage object.)
 
-```{r set.the.scraping.website}
+```{r set.the.scraping.website, warning=FALSE}
 #2 
+theURL <- 'https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=03-32-010&year=2022'
+theWebpageObject <- read_html(theURL)
+theWebpageObject
 
 ```
 
@@ -55,8 +66,27 @@ In the code chunk below scrape these values, assigning them to four separate var
 
 >HINT: The first value should be "Durham", the second "03-32-010", the third "Municipality", and the last should be a vector of 12 numeric values (represented as strings)".
 
-```{r scrape.the.data}
+```{r scrape.the.data, warning=FALSE}
 #3 
+WaterSystemName <- theWebpageObject %>%
+  html_nodes("div+ table tr:nth-child(1) td:nth-child(2)") %>%
+  html_text()
+WaterSystemName
+
+PWSID <- theWebpageObject %>%
+  html_nodes("td tr:nth-child(1) td:nth-child(5)") %>%
+  html_text()
+PWSID
+
+Ownership <- theWebpageObject %>%
+  html_nodes("div+ table tr:nth-child(2) td:nth-child(4)") %>%
+  html_text()
+Ownership
+
+MaxDayUse <- theWebpageObject %>%
+  html_nodes("th~ td+ td") %>%
+  html_text()
+MaxDayUse
 
 ```
 
@@ -69,34 +99,116 @@ In the code chunk below scrape these values, assigning them to four separate var
 
 5. Create a line plot of the maximum daily withdrawals across the months for 2022
 
-```{r create.a.dataframe.from.scraped.data}
+```{r create.a.dataframe.from.scraped.data, warning=FALSE}
 #4 
+month <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+           "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+
+DurhamWater <- data.frame("Month" = month,
+                          "Year" = rep(2022,12))
+
+DurhamWater <- DurhamWater %>%
+  mutate(
+    WaterSystemName = WaterSystemName,
+    PWSID = PWSID,
+    Ownership = Ownership,
+    MaxDayUse = MaxDayUse
+  ) 
+DurhamWater$MaxDayUse <- as.numeric(DurhamWater$MaxDayUse)
 
 #5 
-
+ggplot(DurhamWater,aes(x=Month,y=MaxDayUse, group = 1)) + 
+  geom_line() +
+  labs(
+    title = "2022 Maximum Daily Withdrawls in Durham Municipality",
+    subtitle = "Created by Katie Tack",
+    y="Withdrawal (mgd)",
+    x="Month",
+  ) +
+  scale_x_discrete(labels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                              "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")) +
+  scale_y_continuous(breaks = seq(0, ceiling(max(DurhamWater$MaxDayUse)), by = 2.5))
+  
 ```
 
 6. Note that the PWSID and the year appear in the web address for the page we scraped. Construct a function using your code above that can scrape data for any PWSID and year for which the NC DEQ has data. **Be sure to modify the code to reflect the year and site (pwsid) scraped**.
 
-```{r construct.a.scraping.function}
+```{r construct.a.scraping.function, warning=FALSE}
 #6. 
+scraping <- function(the_pwsid, the_year){
+  NCWaterSite <- read_html(paste0('https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=', 
+                                  the_pwsid, '&year=', the_year))
+  
+  WaterSystemName_tag <- 'div+ table tr:nth-child(1) td:nth-child(2)'
+  PWSID_tag <- 'td tr:nth-child(1) td:nth-child(5)'
+  Ownership_tag <- 'div+ table tr:nth-child(2) td:nth-child(4)'
+  MaxDayUse_tag <- 'th~ td+ td'
+  
+  WaterSystemName <- NCWaterSite %>% html_nodes(WaterSystemName_tag) %>% html_text()
+  PWSID <- NCWaterSite %>% html_nodes(PWSID_tag) %>% html_text()
+  Ownership <- NCWaterSite %>% html_nodes(Ownership_tag) %>% html_text()
+  MaxDayUse <- NCWaterSite %>% html_nodes(MaxDayUse_tag) %>% html_text()
+  
+  month <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+           "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+  DurhamWater <- data.frame("Month" = month,
+                            "Year" = rep(the_year,12))
+  DurhamWater <- DurhamWater %>%
+    mutate(
+      WaterSystemName = WaterSystemName,
+      PWSID = PWSID,
+      Ownership = Ownership,
+      MaxDayUse = MaxDayUse
+    )
+  DurhamWater$MaxDayUse <- as.numeric(DurhamWater$MaxDayUse)
+  return(DurhamWater)
+}
 
 
 ```
 
 7. Use the function above to extract and plot max daily withdrawals for Durham (PWSID='03-32-010') for each month in 2015
 
-```{r fetch.and.plot.Durham.2015.data}
+```{r fetch.and.plot.Durham.2015.data, warning=FALSE}
 #7 
+Durham2015 <- scraping('03-32-010',2015)
 
+ggplot(Durham2015,aes(x=Month,y=MaxDayUse, group = 1,)) + 
+  geom_line() +
+  labs(
+    title = "2015 Maximum Daily Withdrawls in Durham Municipality",
+    subtitle = "Created by Katie Tack",
+    y="Withdrawal (mgd)",
+    x="Month",
+  ) +
+  scale_x_discrete(labels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                              "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")) +
+  scale_y_continuous(breaks = seq(0, ceiling(max(Durham2015$MaxDayUse)), by = 2.5))
 
 ```
 
 8. Use the function above to extract data for Asheville (PWSID = 01-11-010) in 2015. Combine this data with the Durham data collected above and create a plot that compares Asheville's to Durham's water withdrawals.
 
-```{r fetch.and.plot.Asheville.2015.data}
+```{r fetch.and.plot.Asheville.2015.data, warning=FALSE}
 #8 
+Asheville2015 <- scraping('01-11-010',2015)
 
+combined2015 <- rbind(Asheville2015, Durham2015)
+
+combined2015$MaxDayUse <- as.numeric(combined2015$MaxDayUse)
+
+
+ggplot(combined2015,aes(x=Month,y=MaxDayUse, color=PWSID, group = PWSID)) + 
+  geom_line() +
+  labs(
+    title = "2015 Maximum Daily Withdrawls in Durham & Asheville",
+    subtitle = "Created by Katie Tack",
+    y="Withdrawal (mgd)",
+    x="Month"
+  ) +
+  scale_x_discrete(labels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                              "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")) +
+  scale_y_continuous(breaks = seq(0, ceiling(max(combined2015$MaxDayUse)), by = 2.5))
 
 ```
 
@@ -105,9 +217,54 @@ In the code chunk below scrape these values, assigning them to four separate var
 
 > TIP: See Section 3.2 in the "10_Data_Scraping.Rmd" where we apply "map2()" to iteratively run a function over two inputs. Pipe the output of the map2() function to `bindrows()` to combine the dataframes into a single one. 
 
-```{r fetch.and.plot.Asheville.multiyear.data }
+```{r fetch.and.plot.Asheville.multiyear.data, warning=FALSE}
 #9 
+AshevillePWSID <- "01-11-010"
 
+GetAsheville2010to2021 <- function(pwsid, year) {
+  scraping(the_pwsid, the_year)
+}
+
+AshevilleYears <- 2010:2021
+
+Asheville2010to2021 <- map2_dfr(
+  AshevillePWSID, AshevilleYears, 
+  ~ scraping(.x, .y),
+  .id = "Year"
+)
+
+AshevilleMGD <- Asheville2010to2021 %>%
+  mutate(Year = case_when(
+    Year == 1 ~ "2010",
+    Year == 2 ~ "2011",
+    Year == 3 ~ "2012",
+    Year == 4 ~ "2013",
+    Year == 5 ~ "2014",
+    Year == 6 ~ "2015",
+    Year == 7 ~ "2016",
+    Year == 8 ~ "2017",
+    Year == 9 ~ "2018",
+    Year == 10 ~ "2019",
+    Year == 11 ~ "2020",
+    Year == 12 ~ "2021",
+  ))
+
+ggplot(AshevilleMGD,aes(x=Month,y=MaxDayUse, color=Year, group = Year)) + 
+  geom_line() +
+  labs(
+    title = "Maximum Daily Withdrawls in Asheville: 2010-2021",
+    subtitle = "Created by Katie Tack",
+    y="Withdrawal (mgd)",
+    x="Month"
+  ) +
+  scale_x_discrete(labels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                              "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")) +
+  scale_y_continuous(breaks = seq(0, ceiling(max(AshevilleMGD$MaxDayUse)), by = 1))
+
+#used ChatGPT as I wanted to see other ways to scrape in multiple years
+#I was not a huge fan of the way they did it as it didn't bring in the actual years into the Year column
+#which meant I had to reassign the rows into the correct format
+#I decided to keep it in though as another option for myself in the future
 
 ```
 
